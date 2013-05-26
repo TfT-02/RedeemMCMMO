@@ -89,6 +89,25 @@ public class RedeemMCMMO extends JavaPlugin {
         return rsp.getProvider();
     }
 
+    public void send(CommandSender to, String formatMessage, Object... items) {
+        String formatB = ChatColor.translateAlternateColorCodes('&', formatMessage);
+        to.sendMessage(String.format(formatB, items));
+    }
+
+    /*
+     * Green: A
+     * Aqua: B
+     * Red: C
+     * Light Purple: D
+     * Yellow: E
+     *
+     * Success messages should be in Green
+     * Failure messages should be in Red
+     * Players should be enclosed in Yellow
+     * Credits should be enclosed in Light Purple
+     * Commands should be in Aqua
+     */
+
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String args[]) {
         if (cmd.getName().equals("addcredits")) {
             if (args.length == 2) {
