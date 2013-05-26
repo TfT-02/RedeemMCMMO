@@ -1,4 +1,5 @@
 joinMessage: true
 startupAmount: 50
-vault: false
+vault: true
 costPerCredit: 10
+
