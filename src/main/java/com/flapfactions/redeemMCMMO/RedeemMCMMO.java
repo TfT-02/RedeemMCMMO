@@ -110,7 +110,7 @@ public class RedeemMCMMO extends JavaPlugin {
 			} else {
                 return false;
 			}
-		} else if(commandLabel.equalsIgnoreCase("takecredits")) {
+		} else if(cmd.getName().equals("takecredits")) {
 			if(args.length <= 1) {
 				sender.sendMessage(ChatColor.RED + "Too little arguments!");
 			} else if(args.length == 2) {
@@ -146,7 +146,7 @@ public class RedeemMCMMO extends JavaPlugin {
 			} else {
 				sender.sendMessage(ChatColor.RED + "Too many arguments!");
 			}
-		} else if(commandLabel.equalsIgnoreCase("credits")) {
+		} else if(cmd.getName().equals("credits")) {
 			if(sender instanceof Player) {
 				Player player = (Player) sender;
 				if(args.length == 0) {
@@ -177,11 +177,11 @@ public class RedeemMCMMO extends JavaPlugin {
 				sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
 				return true;
 			}
-		} else if(commandLabel.equalsIgnoreCase("rmreload")) {
+		} else if(cmd.getName().equals("rmreload")) {
 			sender.sendMessage(ChatColor.GREEN + "Reloaded configuration file for RedeemMCMMO!");
 			reloadConfig();
 			return true;
-		} else if(commandLabel.equalsIgnoreCase("redeem")) {
+		} else if(cmd.getName().equals("redeem")) {
 			if(!(sender instanceof Player)) {
 				sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
 				return true;
@@ -242,7 +242,7 @@ public class RedeemMCMMO extends JavaPlugin {
 			} else {
 					player.sendMessage(ChatColor.RED + "Too many arguments!");
 			}
-		} else if(commandLabel.equalsIgnoreCase("buycredits")) {
+		} else if(cmd.getName().equals("buycredits")) {
 			if(sender instanceof Player) {
 				Player player = (Player) sender;
 				if(getConfig().getBoolean("vault") == true) {
@@ -299,7 +299,7 @@ public class RedeemMCMMO extends JavaPlugin {
 				sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
 				return true;
 			}
-		} else if(commandLabel.equalsIgnoreCase("rmhelp")) {
+		} else if(cmd.getName().equals("rmhelp")) {
 			sender.sendMessage(ChatColor.YELLOW + "----- " + ChatColor.BLUE + "RedeemMCMMO Help ~ Player Commands" + ChatColor.YELLOW + " -----");
 			sender.sendMessage(ChatColor.AQUA + "/redeem <skill> <amount>" + ChatColor.YELLOW + " - Reedeem your credits into any mcMMO skill.");
 			sender.sendMessage(ChatColor.AQUA + "/buycredits <amount>" + ChatColor.YELLOW + " - Buy credits with ingame money if it is enabled.");
