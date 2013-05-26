@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.api.ExperienceAPI;
+import com.gmail.nossr50.util.commands.CommandUtils;
 
 public class RedeemMCMMO extends JavaPlugin {
     public mcMMO mcmmo;
@@ -143,6 +144,51 @@ public class RedeemMCMMO extends JavaPlugin {
                 }
             } else {
                 sender.sendMessage(ChatColor.RED + "Too many arguments!");
+            }
+        } else if (cmd.getName().equals("sendcredits")) {
+            if (CommandUtils.noConsoleUsage(sender)) {
+                return true;
+            }
+            if (args.length == 2) {
+                Player target = getServer().getPlayer(args[0]);
+                if (target == null) {
+                    sender.sendMessage(ChatColor.RED + "Could not find that player!");
+                }
+                String targetPlayer = target.getName();
+                String targetName = getConfig().getString(targetPlayer);
+                Player source = (Player) sender;
+                String sourcePlayer = source.getName();
+                String sourceName = getConfig().getString(sourcePlayer);
+                int amount = Integer.parseInt(args[1]);
+                if (amount <= 0) {
+                    sender.sendMessage(ChatColor.RED + "The amount must be a positive number!");
+                    return true;
+                }
+                if (sourceName == null) {
+                    sender.sendMessage(ChatColor.YELLOW + "You" + ChatColor.RED + " don't have any credits to send!");
+                    return true;
+                }
+                int sourceOldAmount = getConfig().getInt(targetPlayer + ".credits");
+                if (amount > sourceOldAmount) {
+                    sender.sendMessage(ChatColor.YELLOW + "You" + ChatColor.RED + " don't have that many credits!");
+                    return true;
+                }
+                int newSourceAmount = sourceOldAmount - amount;
+                int oldTargetAmount = 0;
+                if (targetName != null) {
+                    oldTargetAmount = getConfig().getInt(targetPlayer + ".credits");
+                }
+                int newTargetAmount = oldTargetAmount + amount;
+                getConfig().set(targetPlayer + ".credits", newTargetAmount);
+                getConfig().set(sourcePlayer + ".credits", newSourceAmount);
+                saveConfig();
+                sender.sendMessage(ChatColor.GREEN + "You have given " + ChatColor.GOLD + amount + ChatColor.GREEN + " credits to " + ChatColor.GOLD + args[0]);
+                sender.sendMessage(ChatColor.GREEN + "NEW CREDIT BALANCE: " + ChatColor.GOLD + newSourceAmount);
+                target.sendMessage(ChatColor.GREEN + "You have just received " + ChatColor.GOLD + amount + ChatColor.GREEN + " MCMMO credits from " + ChatColor.YELLOW + sourcePlayer + ChatColor.GREEN + ".");
+                target.sendMessage(ChatColor.GREEN + "NEW CREDIT BALANCE: " + ChatColor.GOLD + newTargetAmount);
+                return true;
+            } else {
+                return false;
             }
         } else if (cmd.getName().equals("credits")) {
             if (sender instanceof Player) {

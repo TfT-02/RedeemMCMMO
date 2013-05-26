@@ -10,22 +10,27 @@ commands:
     description: Give a player credits towards MCMMO levels.
     usage: /addcredits <player> <amount>
     permission: redeemMCMMO.addcredits
-    permission-message: You do not have permission to use this command.
+    permission-message: You do not have permission to create credits.
   takecredits:
     description: Takes credits from a player.
     usage: /takecredits <player> <amount>
     permission: redeemMCMMO.takecredits
-    permission-message: You do not have permission to use this command.
+    permission-message: You do not have permission to remove credits.
+  sendcredits:
+    description: Give another player some of your credits towards McMMO levels.
+    usage: /sendcredits <player> <amount>
+    permission: redeemMCMMO.sendcredits
+    permission-message: You do not have permission to send others credits.
   buycredits:
     description: Buy credits.
     usage: /buycredits <amount>
     permission: redeemMCMMO.buycredits
-    permission-message: You do not have permission to use this command.
+    permission-message: You do not have permission to purchase credits.
   credits:
     description: Shows the amount of credits you have.
     usage: /credits [player]
     permission: redeemMCMMO.showcredits
-    permission-message: You do not have permission to use this command.
+    permission-message: You do not have permission to view your credits.
   rmreload:
     description: Reloads the config file.
     usage: /rmreload
@@ -35,7 +40,7 @@ commands:
     description: Redeem mcmmo levels from your credits.
     usage: /redeem <skill> <amount>
     permission: redeemMCMMO.redeem
-    permission-message: You do not have permission to use this command.
+    permission-message: You do not have permission to redeem credits.
   rmhelp:
     description: Veiw a list of commands for redeemMCMMO.
     usage: /rmhelp
@@ -43,12 +48,19 @@ commands:
     permission-message: You do not have permission to use this command.
 permissions:
   redeemMCMMO.addcredits:
+    default: op
   redeemMCMMO.takecredits:
+    default: op
+  redeemMCMMO.sendcredits:
+    default: true
   redeemMCMMO.buycredits:
+    default: true
   redeemMCMMO.showcredits:
     default: true
   redeemMCMMO.rmreload:
     default: op
   redeemMCMMO.redeem:
+    default: true
   redeemMCMMO.rmhelp:
+    default: true
 
