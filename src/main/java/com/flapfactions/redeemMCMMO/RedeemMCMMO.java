@@ -131,74 +131,86 @@ public class RedeemMCMMO extends JavaPlugin {
             if (args.length == 2) {
                 Player target = (Bukkit.getServer().getPlayer(args[0]));
                 if (target == null) {
-                    sender.sendMessage(ChatColor.YELLOW + args[0] + ChatColor.RED + " is not online or doesn't exist!");
-                    return true;
+                    send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
+                    return true; // TODO unindent
                 } else {
                     String targetPlayer = target.getName();
                     String targetName = getConfig().getString(targetPlayer);
-                    int amount = Integer.parseInt(args[1]);
-                    if (amount <= 0) {
-                        sender.sendMessage(ChatColor.RED + "The amount must be a positive number!");
+                    int amount;
+                    try {
+                        amount = Integer.parseInt(args[1]);
+                    } catch (NumberFormatException e) {
+                        send(sender, "&cThe amount must be a positive integer!");
                         return true;
                     }
+                    if (amount <= 0) {
+                        send(sender, "&cThe amount must be a positive integer!");
+                        return true;
+                    }
+                    int newAmount;
                     if (targetName != null) {
                         int oldAmount = getConfig().getInt(targetPlayer + ".credits");
-                        int newAmount = oldAmount + amount;
-                        getConfig().set(targetPlayer + ".credits", newAmount);
-                        saveConfig();
-                        sender.sendMessage(ChatColor.GREEN + "You have given " + ChatColor.GOLD + targetPlayer + ", " + amount + ChatColor.GREEN + " MCMMO credits.");
-                        target.sendMessage(ChatColor.GREEN + "You have just received " + ChatColor.GOLD + amount + ChatColor.GREEN + " MCMMO credits.");
-                        target.sendMessage(ChatColor.GREEN + "NEW CREDIT BALANCE: " + ChatColor.GOLD + newAmount);
-                        target.sendMessage(ChatColor.GREEN + "Do " + ChatColor.AQUA + "/rmhelp" + ChatColor.GREEN + " for help with redeeming them!");
-                        return true;
+                        newAmount = oldAmount + amount;
                     } else {
-                        getConfig().set(targetPlayer + ".credits", amount);
-                        saveConfig();
-                        sender.sendMessage(ChatColor.GREEN + "You have given " + ChatColor.GOLD + targetPlayer + ", " + amount + ChatColor.GREEN + " MCMMO credits.");
-                        target.sendMessage(ChatColor.GREEN + "You have just received " + ChatColor.GOLD + amount + ChatColor.GREEN + " MCMMO credits.");
-                        target.sendMessage(ChatColor.GREEN + "NEW CREDIT BALANCE: " + ChatColor.GOLD + amount);
-                        target.sendMessage(ChatColor.GREEN + "Do " + ChatColor.AQUA + "/rmhelp" + ChatColor.GREEN + " for help with redeeming them!");
-                        return true;
+                        newAmount = amount;
                     }
+                    getConfig().set(targetPlayer + ".credits", newAmount);
+                    saveConfig();
+                    send(sender, "&aYou have given &e%s&a &6%d&a McMMO credits.", targetPlayer, amount);
+                    send(target, "&aYou have just received &6%d&a McMMO credits.", amount);
+                    send(target, "&aNEW CREDIT BALANCE: &6%d", newAmount);
+                    send(target, "&aUse &b/rmhelp&a for help with redeeming them!");
+                    return true;
                 }
             } else {
-                return false;
+                return false; // usage
             }
         } else if (cmd.getName().equals("takecredits")) {
-            if (args.length <= 1) {
-                sender.sendMessage(ChatColor.RED + "Too little arguments!");
-            } else if (args.length == 2) {
+            if (args.length == 2) {
                 Player target = (Bukkit.getServer().getPlayer(args[0]));
                 if (target == null) {
-                    sender.sendMessage(ChatColor.YELLOW + args[0] + ChatColor.RED + " is not online or doesn't exist!");
-                    return true;
+                    send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
+                    return true; // TODO unindent
                 } else {
                     String targetPlayer = target.getName();
                     String targetName = getConfig().getString(targetPlayer);
-                    int amount = Integer.parseInt(args[1]);
+                    int amount;
+                    try {
+                        amount = Integer.parseInt(args[1]);
+                    } catch (NumberFormatException e) {
+                        send(sender, "&cThe amount must be a positive integer!");
+                        return true;
+                    }
                     if (amount <= 0) {
-                        sender.sendMessage(ChatColor.RED + "The amount must be a positive number!");
+                        send(sender, "&cThe amount must be a positive integer!");
                         return true;
                     }
                     if (targetName != null) {
                         int oldAmount = getConfig().getInt(targetPlayer + ".credits");
-                        if (amount <= oldAmount) {
-                            int newAmount = oldAmount - amount;
-                            getConfig().set(targetPlayer + ".credits", newAmount);
-                            saveConfig();
-                            sender.sendMessage(ChatColor.GREEN + "You have taken " + ChatColor.GOLD + amount + ChatColor.GREEN + " credits off " + ChatColor.GOLD + args[0]);
-                            return true;
-                        } else {
-                            sender.sendMessage(ChatColor.YELLOW + args[0] + ChatColor.RED + " already has 0 credits!");
-                            return true;
+                        int newAmount = oldAmount - amount;
+                        if (newAmount < 0) {
+                            // typo leniency - if you overshoot by less than 10, the command still goes through
+                            if (newAmount < -10) {
+                                send(sender, "&e%s&c doesn't have that many credits!", targetPlayer);
+                                return true;
+                            }
+                            send(sender, "&e%s&c doesn't have &6%d&c credits! Assuming you want to take &6%d&c credits.", targetPlayer, amount, oldAmount);
+                            amount = oldAmount;
+                            newAmount = 0;
                         }
-                    } else {
-                        sender.sendMessage(ChatColor.YELLOW + args[0] + ChatColor.RED + " already has 0 credits!");
+                        getConfig().set(targetPlayer + ".credits", newAmount);
+                        saveConfig();
+                        send(sender, "&aYou have taken &6%d&a credits off &e%s", amount, targetPlayer);
+                        send(target, "&aYou have lost &6%d&a credits.", amount);
+                        send(target, "&aNEW CREDIT BALANCE: &6%d", newAmount);
                         return true;
+                    } else {
+                        send(sender, "&e%s&c doesn't have any credits!", targetPlayer);
+                        return true; // TODO unindent
                     }
                 }
             } else {
-                sender.sendMessage(ChatColor.RED + "Too many arguments!");
+                return false; // usage
             }
         } else if (cmd.getName().equals("sendcredits")) {
             if (CommandUtils.noConsoleUsage(sender)) {
@@ -207,25 +219,32 @@ public class RedeemMCMMO extends JavaPlugin {
             if (args.length == 2) {
                 Player target = getServer().getPlayer(args[0]);
                 if (target == null) {
-                    sender.sendMessage(ChatColor.RED + "Could not find that player!");
+                    send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
+                    return true;
                 }
                 String targetPlayer = target.getName();
                 String targetName = getConfig().getString(targetPlayer);
                 Player source = (Player) sender;
                 String sourcePlayer = source.getName();
                 String sourceName = getConfig().getString(sourcePlayer);
-                int amount = Integer.parseInt(args[1]);
+                int amount;
+                try {
+                    amount = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    send(sender, "&cThe amount must be a positive integer!");
+                    return true;
+                }
                 if (amount <= 0) {
-                    sender.sendMessage(ChatColor.RED + "The amount must be a positive number!");
+                    send(sender, "&cThe amount must be a positive integer!");
                     return true;
                 }
                 if (sourceName == null) {
-                    sender.sendMessage(ChatColor.YELLOW + "You" + ChatColor.RED + " don't have any credits to send!");
+                    send(sender, "&eYou&c don't have any credits to send!");
                     return true;
                 }
                 int sourceOldAmount = getConfig().getInt(targetPlayer + ".credits");
                 if (amount > sourceOldAmount) {
-                    sender.sendMessage(ChatColor.YELLOW + "You" + ChatColor.RED + " don't have that many credits!");
+                    send(sender, "&eYou&c don't have &6%d&c credits!", amount);
                     return true;
                 }
                 int newSourceAmount = sourceOldAmount - amount;
@@ -237,166 +256,165 @@ public class RedeemMCMMO extends JavaPlugin {
                 getConfig().set(targetPlayer + ".credits", newTargetAmount);
                 getConfig().set(sourcePlayer + ".credits", newSourceAmount);
                 saveConfig();
-                sender.sendMessage(ChatColor.GREEN + "You have given " + ChatColor.GOLD + amount + ChatColor.GREEN + " credits to " + ChatColor.GOLD + args[0]);
-                sender.sendMessage(ChatColor.GREEN + "NEW CREDIT BALANCE: " + ChatColor.GOLD + newSourceAmount);
-                target.sendMessage(ChatColor.GREEN + "You have just received " + ChatColor.GOLD + amount + ChatColor.GREEN + " MCMMO credits from " + ChatColor.YELLOW + sourcePlayer + ChatColor.GREEN + ".");
-                target.sendMessage(ChatColor.GREEN + "NEW CREDIT BALANCE: " + ChatColor.GOLD + newTargetAmount);
+                send(sender, "&aYou have sent &6%d&a McMMO credits to &e%s&a.", amount, targetPlayer);
+                send(target, "&aYou have just received &6%d&a McMMO credits from &e%s&a.", amount, sourcePlayer);
+                send(sender, "&aNEW CREDIT BALANCE: &6%d", newSourceAmount);
+                send(target, "&aNEW CREDIT BALANCE: &6%d", newTargetAmount);
                 return true;
             } else {
-                return false;
+                return false; // usage
             }
         } else if (cmd.getName().equals("credits")) {
-            if (sender instanceof Player) {
+            if (!(sender instanceof Player)) {
+                send(sender, "&cThis command can only be run by a player!");
+                return true;
+            } else {
                 Player player = (Player) sender;
                 if (args.length == 0) {
                     String name = player.getName();
                     String playerName = getConfig().getString(name);
                     if (playerName != null) {
                         int credits = getConfig().getInt(name + ".credits");
-                        player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.GOLD + credits + ChatColor.GREEN + " MCMMO credits remaining.");
+                        send(player, "&aYou have &6%d&a McMMO credits remaining.", credits);
                         return true;
                     } else {
-                        player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.GOLD + "0" + ChatColor.GREEN + " MCMMO credits remaining.");
-                        return true;
+                        send(player, "&aYou have &6%d&a McMMO credits remaining.", 0);
+                        return true; // TODO wrap into above
                     }
-                } else if (args.length == 1) {
+                } else if (args.length == 1) { // TODO allow console
                     String targetName = getConfig().getString(args[0]);
                     if (targetName != null) {
                         int credits = getConfig().getInt(args[0] + ".credits");
-                        player.sendMessage(ChatColor.GOLD + args[0] + ChatColor.GREEN + " has " + ChatColor.GOLD + credits + ChatColor.GREEN + " MCMMO credits remaining.");
+                        send(player, "&e%s&a has &6%d&a McMMO credits remaining.", args[0], credits);
                         return true;
                     } else {
-                        player.sendMessage(ChatColor.GOLD + args[0] + ChatColor.GREEN + " has " + ChatColor.GOLD + "0 " + ChatColor.GREEN + "MCMMO credits remaining.");
-                        return true;
+                        send(player, "&e%s&a has &6%d&a McMMO credits remaining.", args[0], 0);
+                        return true; // TODO wrap into above
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED + "Too many arguments!");
+                    return false; // usage
                 }
-            } else {
-                sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
-                return true;
             }
         } else if (cmd.getName().equals("rmreload")) {
-            sender.sendMessage(ChatColor.GREEN + "Reloaded configuration file for RedeemMCMMO!");
             reloadConfig();
+            send(sender, "&aReloaded configuration file for RedeemMCMMO!");
             return true;
         } else if (cmd.getName().equals("redeem")) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
+            if (CommandUtils.noConsoleUsage(sender)) {
                 return true;
             }
             Player player = (Player) sender;
-            if (args.length <= 1) {
-                player.sendMessage(ChatColor.RED + "Too little arguments!");
-            } else if (args.length == 2) {
+            if (args.length == 2) {
                 String skillType = args[0];
-                int cap = 0;
-
-                if (skillType.equalsIgnoreCase("taming") || skillType.equalsIgnoreCase("swords") || skillType.equalsIgnoreCase("unarmed") || skillType.equalsIgnoreCase("archery") || skillType.equalsIgnoreCase("axes") || skillType.equalsIgnoreCase("acrobatics") || skillType.equalsIgnoreCase("fishing") || skillType.equalsIgnoreCase("excavation") || skillType.equalsIgnoreCase("mining") || skillType.equalsIgnoreCase("herbalism") || skillType.equalsIgnoreCase("repair") || skillType.equalsIgnoreCase("woodcutting")) {
-                    cap = ExperienceAPI.getLevelCap(skillType);
-                } else {
-                    player.sendMessage(ChatColor.RED + skillType + " is not a valid skill!");
-                    return true;
-                }
                 try {
-                    Integer.parseInt(args[1]);
-                } catch (NumberFormatException ex) {
-                    player.sendMessage(ChatColor.RED + "The amount of credits must be a number!");
-                    return true;
-                }
-                int amount = Integer.parseInt(args[1]);
-                int oldamount = getConfig().getInt(player.getName() + ".credits");
-                if (oldamount < amount) {
-                    player.sendMessage(ChatColor.RED + "You do not have enough credits!");
-                    return true;
-                }
-                if (amount <= 0) {
-                    player.sendMessage(ChatColor.RED + "The amount must be a positive number!");
-                    return true;
-                }
-                if (ExperienceAPI.getLevel(player, skillType) + amount > cap) {
-                    player.sendMessage(ChatColor.RED + "You have reached the maximum for " + skillType);
-                    return true;
-                }
-                int newamount = oldamount - amount;
-                getConfig().set(player.getName() + ".credits", newamount);
-                saveConfig();
+                    int cap = ExperienceAPI.getLevelCap(skillType);
+                    int amount = Integer.parseInt(args[1]);
 
-                ExperienceAPI.addLevel(player, skillType, amount);
-                player.sendMessage(ChatColor.GREEN + "You have added " + ChatColor.GOLD + amount + ChatColor.GREEN + " credits to " + ChatColor.GOLD + skillType + ChatColor.GREEN + ".");
-                return true;
+                    int oldAmount = getConfig().getInt(player.getName() + ".credits");
+                    if (oldAmount < amount) {
+                        send(player, "&cYou do not have enough credits!");
+                        return true;
+                    }
+                    if (amount <= 0) {
+                        send(player, "&cThe amount must be a positive integer!");
+                        return true;
+                    }
+                    if (ExperienceAPI.getLevel(player, skillType) + amount > cap) {
+                        send(player, "&cYou may not exceed the maximum level (&d%d&c) for &6%s&c!", cap, skillType);
+                        return true;
+                    }
+                    int newAmount = oldAmount - amount;
+                    getConfig().set(player.getName() + ".credits", newAmount);
+                    ExperienceAPI.addLevel(player, skillType, amount);
+                    saveConfig();
+                    send(player, "&aYou have gained &d%d&a levels in &6%s&a!", amount, skillType);
+                    send(sender, "&aNEW CREDIT BALANCE: &6%d", newAmount);
+                    return true;
+                } catch (InvalidSkillException e) {
+                    send(player, "&e%s&c is not a valid skill!", skillType);
+                    return true;
+                } catch (NumberFormatException e) {
+                    send(sender, "&cThe amount must be a positive integer!");
+                    return true;
+                }
             } else {
-                player.sendMessage(ChatColor.RED + "Too many arguments!");
+                return false; // usage
             }
         } else if (cmd.getName().equals("buycredits")) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                if (getConfig().getBoolean("vault") == true) {
-                    if (args.length == 0) {
-                        player.sendMessage(ChatColor.RED + "Too little arguments!");
-                    } else if (args.length == 1) {
-                        int amount = Integer.parseInt(args[0]);
-                        int cost = amount * getConfig().getInt("costPerCredit");
-                        double balance = econ.getBalance(player.getName());
-                        if (amount <= 0) {
-                            player.sendMessage(ChatColor.RED + "The amount must be a positive number!");
-                        } else {
-                            if (balance >= cost) {
-                                String playerName1 = player.getName();
-                                String playerName = getConfig().getString(playerName1);
-                                if (playerName != null) {
-                                    EconomyResponse r = econ.withdrawPlayer(playerName1, cost);
-                                    if (r.transactionSuccess()) {
-                                        int oldAmount = getConfig().getInt(playerName1 + ".credits");
-                                        int newAmount = oldAmount + amount;
-                                        getConfig().set(playerName1 + ".credits", newAmount);
-                                        saveConfig();
-                                        player.sendMessage(ChatColor.GREEN + "You bought " + ChatColor.GOLD + amount + ChatColor.GREEN + " MCMMO credits.");
-                                        return true;
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "Your payment failed, try again or contact an admin!");
-                                        return true;
-                                    }
-                                } else {
-                                    EconomyResponse r = econ.withdrawPlayer(playerName1, cost);
-                                    if (r.transactionSuccess()) {
-                                        getConfig().set(playerName1 + ".credits", amount);
-                                        saveConfig();
-                                        player.sendMessage(ChatColor.GREEN + "You bought " + ChatColor.GOLD + amount + ChatColor.GREEN + " MCMMO credits.");
-                                        return true;
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "Your payment failed, try again or contact an admin!");
-                                        return true;
-                                    }
-                                }
-                            } else {
-                                player.sendMessage(ChatColor.RED + "You do not have enough money to buy that many credits!");
-                                return true;
-                            }
-                        }
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Too many arguments!");
-                    }
+            if (CommandUtils.noConsoleUsage(sender)) {
+                return true;
+            }
+            Player player = (Player) sender;
+            if (econ == null) {
+                send(player, "&cThis feature is not enabled!");
+                return true;
+            }
+            if (args.length != 1) {
+                return false; // usage
+            }
+            int amount = Integer.parseInt(args[0]);
+            int cost = amount * getConfig().getInt("costPerCredit");
+            double balance = econ.getBalance(player.getName());
+            String currencyName = econ.currencyNamePlural();
+            if (amount <= 0) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
+            }
+            if (balance < cost) {
+                if (currencyName == null) {
+                    send(sender, "&cYou do not have enough money to buy &6%d&c credits; you need at least &6%d&c.", amount, cost);
                 } else {
-                    player.sendMessage(ChatColor.RED + "This feature is not enabled!");
+                    send(sender, "&cYou do not have enough money to buy &6%d&c credits; you need at least &6%d %s&c.", amount, cost, currencyName);
+                }
+                return true;
+            }
+            String playerName1 = player.getName();
+            String playerName = getConfig().getString(playerName1);
+            if (playerName != null) {
+                EconomyResponse r = econ.withdrawPlayer(playerName1, cost);
+                if (!r.transactionSuccess()) {
+                    send(sender, "&cYour payment failed, try again or contact an admin. Reason: &e\"%s\"", r.errorMessage);
                     return true;
                 }
+                int oldAmount = getConfig().getInt(playerName1 + ".credits");
+                int newAmount = oldAmount + amount;
+                getConfig().set(playerName1 + ".credits", newAmount);
+                saveConfig();
+
+                if (currencyName == null) {
+                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d&a.", amount, cost);
+                } else {
+                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d %s&a.", amount, cost, currencyName);
+                }
+                return true;
             } else {
-                sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
+                EconomyResponse r = econ.withdrawPlayer(playerName1, cost);
+                if (!r.transactionSuccess()) {
+                    send(sender, "&cYour payment failed, try again or contact an admin. Reason: &e\"%s\"", r.errorMessage);
+                    return true;
+                }
+                getConfig().set(playerName1 + ".credits", amount);
+                saveConfig();
+
+                if (currencyName == null) {
+                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d&a.", amount, cost);
+                } else {
+                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d %s&a.", amount, cost, currencyName);
+                }
                 return true;
             }
         } else if (cmd.getName().equals("rmhelp")) {
-            sender.sendMessage(ChatColor.YELLOW + "----- " + ChatColor.BLUE + "RedeemMCMMO Help ~ Player Commands" + ChatColor.YELLOW + " -----");
-            sender.sendMessage(ChatColor.AQUA + "/redeem <skill> <amount>" + ChatColor.YELLOW + " - Reedeem your credits into any mcMMO skill.");
-            sender.sendMessage(ChatColor.AQUA + "/buycredits <amount>" + ChatColor.YELLOW + " - Buy credits with ingame money if it is enabled.");
-            sender.sendMessage(ChatColor.AQUA + "/credits [player]" + ChatColor.YELLOW + " - Veiw your own or another players credit balance.");
-            sender.sendMessage(ChatColor.YELLOW + "----- " + ChatColor.BLUE + "RedeemMCMMO Help ~ Admin Commands" + ChatColor.YELLOW + " -----");
-            sender.sendMessage(ChatColor.AQUA + "/addcredits <player> <amount>" + ChatColor.YELLOW + " - Give a player credits.");
-            sender.sendMessage(ChatColor.AQUA + "/takecredits <player> <amount>" + ChatColor.YELLOW + " - Take credits away from a player.");
-            sender.sendMessage(ChatColor.AQUA + "/rmreload" + ChatColor.YELLOW + " - Reload the configuration file.");
+            send(sender, "&e----- &9RedeemMCMMO Help ~ Player Commands&e -----");
+            send(sender, ((econ != null && sender.hasPermission("redeemMCMMO.buycredits")) ? "&b" : "&c") + "/buycredits <amount>&e - Buy credits with ingame money if it is enabled.");
+            send(sender, (sender.hasPermission("redeemMCMMO.showcredits") ? "&b" : "&c") + "/credits [player]&e - View your own or another players credit balance.");
+            send(sender, (sender.hasPermission("redeemMCMMO.sendcredits") ? "&b" : "&c") + "/sendcredits <player> <amount>&e - Reedeem your credits into any mcMMO skill.");
+            send(sender, (sender.hasPermission("redeemMCMMO.redeem") ? "&b" : "&c") + "/redeem <skill> <amount>&e - Reedeem your credits into any mcMMO skill.");
+            send(sender, "&e----- &9RedeemMCMMO Help ~ Admin Commands&e -----");
+            send(sender, (sender.hasPermission("redeemMCMMO.addcredits") ? "&b" : "&c") + "/addcredits <player> <amount>&e - Give a player credits.");
+            send(sender, (sender.hasPermission("redeemMCMMO.takecredits") ? "&b" : "&c") + "/takecredits <player> <amount>&e - Take credits away from a player.");
+            send(sender, (sender.hasPermission("redeemMCMMO.rmreload") ? "&b" : "&c") + "/rmreload&e - Reload the configuration file.");
             return true;
         }
-        return false;
+        return false; // usage
     }
-
 }
