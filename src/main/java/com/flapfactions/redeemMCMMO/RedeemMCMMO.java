@@ -1,5 +1,6 @@
 package com.flapfactions.redeemMCMMO;
 
+import java.io.File;
 import java.io.IOException;
 
 import net.milkbowl.vault.economy.Economy;
@@ -9,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -24,6 +26,9 @@ public class RedeemMCMMO extends JavaPlugin {
     public mcMMO mcmmo;
     public playerListener pl;
     public Economy econ = null;
+
+    public File creditsFile;
+    public YamlConfiguration credits;
 
     @Override
     public void onEnable() {
@@ -50,14 +55,27 @@ public class RedeemMCMMO extends JavaPlugin {
         } catch (IOException e) {
             getLogger().warning("Failed to submit Plugin Metrics :(");
         }
-        getLogger().info("RedeemMCMMO is now enabled - Originally by Candybuddy");
+        creditsFile = new File(this.getDataFolder(), "credits.yml");
+        credits = YamlConfiguration.loadConfiguration(creditsFile);
         getConfig().options().copyDefaults(true);
         saveConfig();
+
+        getLogger().info(ChatColor.GREEN + "RedeemMCMMO is now enabled - Originally by Candybuddy");
     }
 
     @Override
     public void onDisable() {
         saveConfig();
+    }
+
+    @Override
+    public void saveConfig() {
+        super.saveConfig();
+        try {
+            credits.save(creditsFile);
+        } catch (IOException e) {
+            getLogger().warning("Error saving credits file");
+        }
     }
 
     private Economy getEconomy() {
