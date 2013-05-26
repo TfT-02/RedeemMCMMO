@@ -10,12 +10,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 public class playerListener implements Listener {
-	
-	public static RedeemMCMMO plugin;
-	
+
+	public RedeemMCMMO plugin;
+
+	public playerListener(RedeemMCMMO plugin) {
+	    this.plugin = plugin;
+	}
+
 	@EventHandler
 	public void onLogin(PlayerLoginEvent event) {
-		plugin = RedeemMCMMO.instance;
 		Player player = event.getPlayer();
 		File playerDat = new File("world/players/"+ player.getName() + ".dat");
 		if(!playerDat.exists()) {
@@ -29,10 +32,9 @@ public class playerListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		plugin = RedeemMCMMO.instance;
 		Player player = event.getPlayer();
 		int credits = plugin.getConfig().getInt(player.getName() + ".credits");
 		if(credits == 0) {
@@ -44,5 +46,4 @@ public class playerListener implements Listener {
 			}
 		}
 	}
-
 }

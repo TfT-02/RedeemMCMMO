@@ -12,67 +12,69 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.UnknownDependencyException;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.api.ExperienceAPI;
 
 public class RedeemMCMMO extends JavaPlugin {
-	private static final Logger log = Logger.getLogger("Minecraft");
-	public final playerListener pl = new playerListener();
-	public static RedeemMCMMO instance;
-	public static Economy econ = null;
-	
+    public mcMMO mcmmo;
+	public playerListener pl;
+	public Economy econ = null;
+
 	@Override
 	public void onEnable() {
-		instance = this;
-		PluginManager pm = getServer().getPluginManager();
-		if(pm.isPluginEnabled("mcMMO")==false) {
-			getServer().getLogger().log(Level.SEVERE, "mcMMO is not enabled! Disabling RedeemMCMMO!");
-			pm.disablePlugin(this);
+		PluginManager plugMan = getServer().getPluginManager();
+		Plugin mcm = plugMan.getPlugin("mcmmo");
+		if (!(mcm instanceof mcMMO)) {
+		    throw new UnknownDependencyException("Can't find the right mcMMO, did it have an update?");
+		}
+		mcmmo = (mcMMO) mcm;
+		if (!mcmmo.isEnabled()) {
+			getLogger().severe("mcMMO is not enabled! Disabling RedeemMCMMO!");
+			plugMan.disablePlugin(this);
 			return;
 		}
-		pm.registerEvents(this.pl, this);
-		System.out.println("RedeemMCMMO is now enabled - Made by Candybuddy");
+		econ = getEconomy();
+        if (econ == null) {
+            getLogger().warning("Failed to setup economy! Economy features will be disabled.");
+        }
+        pl = new playerListener(this);
+        plugMan.registerEvents(this.pl, this);
+        try {
+            Metrics metrics = new Metrics(this);
+            metrics.start();
+        } catch (IOException e) {
+            getLogger().warning("Failed to submit Plugin Metrics :(");
+        }
+		getLogger().info("RedeemMCMMO is now enabled - Originally by Candybuddy");
 		getConfig().options().copyDefaults(true);
 		saveConfig();
-		if (!setupEconomy() ) {
-            log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-		try {
-		    Metrics metrics = new Metrics(this);
-		    metrics.start();
-		} catch (IOException e) {
-		    // Failed to submit the stats :-(
-		}
 	}
-	
+
 	@Override
 	public void onDisable() {
-		System.out.println("RedeemMCMMO is now disabled - Made by Candybuddy");
 		saveConfig();
 	}
-	
-	private boolean setupEconomy() {
+
+	private Economy getEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
+            return null;
         }
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
-            return false;
+            return null;
         }
-        econ = rsp.getProvider();
-        return econ != null;
+        return rsp.getProvider();
     }
-	
+
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String args[]) {
-		if(commandLabel.equalsIgnoreCase("addcredits")) {
-			if(args.length <= 1) {
-				sender.sendMessage(ChatColor.RED + "Too little arguments!");
-			} else if(args.length == 2) {
+		if (cmd.getName().equals("addcredits")) {
+			if (args.length == 2) {
 				Player target = (Bukkit.getServer().getPlayer(args[0]));
 				if(target == null) {
 					sender.sendMessage(ChatColor.YELLOW + args[0] + ChatColor.RED + " is not online or doesn't exist!");
@@ -80,7 +82,7 @@ public class RedeemMCMMO extends JavaPlugin {
 				} else {
 					String targetPlayer = target.getName();
 					String targetName = getConfig().getString(targetPlayer);
-					int amount = Integer.parseInt( args[1] );
+					int amount = Integer.parseInt(args[1]);
 					if(amount <= 0) {
 						sender.sendMessage(ChatColor.RED + "The amount must be a positive number!");
 						return true;
@@ -106,7 +108,7 @@ public class RedeemMCMMO extends JavaPlugin {
 					}
 				}
 			} else {
-				sender.sendMessage(ChatColor.RED + "Too many arguments!");
+                return false;
 			}
 		} else if(commandLabel.equalsIgnoreCase("takecredits")) {
 			if(args.length <= 1) {
@@ -233,7 +235,7 @@ public class RedeemMCMMO extends JavaPlugin {
 				int newamount = oldamount-amount;
 				getConfig().set(player.getName() + ".credits", newamount);
 				saveConfig();
-				
+
 				ExperienceAPI.addLevel(player, skillType, amount);
 				player.sendMessage(ChatColor.GREEN + "You have added " + ChatColor.GOLD + amount + ChatColor.GREEN +" credits to " + ChatColor.GOLD + skillType + ChatColor.GREEN + ".");
 				return true;
@@ -310,5 +312,5 @@ public class RedeemMCMMO extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 }
