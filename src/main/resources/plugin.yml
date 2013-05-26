@@ -24,7 +24,7 @@ commands:
   credits:
     description: Shows the amount of credits you have.
     usage: /credits [player]
-    permission: redeemMCMMO.credits
+    permission: redeemMCMMO.showcredits
     permission-message: You do not have permission to use this command.
   rmreload:
     description: Reloads the config file.
@@ -41,3 +41,14 @@ commands:
     usage: /rmhelp
     permission: redeemMCMMO.rmhelp
     permission-message: You do not have permission to use this command.
+permissions:
+  redeemMCMMO.addcredits:
+  redeemMCMMO.takecredits:
+  redeemMCMMO.buycredits:
+  redeemMCMMO.showcredits:
+    default: true
+  redeemMCMMO.rmreload:
+    default: op
+  redeemMCMMO.redeem:
+  redeemMCMMO.rmhelp:
+
