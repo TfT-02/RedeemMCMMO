@@ -273,24 +273,20 @@ public class RedeemMCMMO extends JavaPlugin {
                 if (args.length == 0) {
                     String name = player.getName();
                     String playerName = getConfig().getString(name);
+                    int credits = 0;
                     if (playerName != null) {
-                        int credits = getConfig().getInt(name + ".credits");
-                        send(player, "&aYou have &6%d&a McMMO credits remaining.", credits);
-                        return true;
-                    } else {
-                        send(player, "&aYou have &6%d&a McMMO credits remaining.", 0);
-                        return true; // TODO wrap into above
+                        credits = getConfig().getInt(name + ".credits");
                     }
+                    send(player, "&aYou have &6%d&a McMMO credits remaining.", credits);
+                    return true;
                 } else if (args.length == 1) { // TODO allow console
                     String targetName = getConfig().getString(args[0]);
+                    int credits = 0;
                     if (targetName != null) {
-                        int credits = getConfig().getInt(args[0] + ".credits");
-                        send(player, "&e%s&a has &6%d&a McMMO credits remaining.", args[0], credits);
-                        return true;
-                    } else {
-                        send(player, "&e%s&a has &6%d&a McMMO credits remaining.", args[0], 0);
-                        return true; // TODO wrap into above
+                        credits = getConfig().getInt(args[0] + ".credits");
                     }
+                    send(player, "&e%s&a has &6%d&a McMMO credits remaining.", args[0], credits);
+                    return true;
                 } else {
                     return false; // usage
                 }
@@ -368,41 +364,31 @@ public class RedeemMCMMO extends JavaPlugin {
                 }
                 return true;
             }
+
             String playerName1 = player.getName();
             String playerName = getConfig().getString(playerName1);
+
+            int oldAmount = 0;
             if (playerName != null) {
-                EconomyResponse r = econ.withdrawPlayer(playerName1, cost);
-                if (!r.transactionSuccess()) {
-                    send(sender, "&cYour payment failed, try again or contact an admin. Reason: &e\"%s\"", r.errorMessage);
-                    return true;
-                }
-                int oldAmount = getConfig().getInt(playerName1 + ".credits");
-                int newAmount = oldAmount + amount;
-                getConfig().set(playerName1 + ".credits", newAmount);
-                saveConfig();
+                oldAmount = getConfig().getInt(playerName1 + ".credits");
+            }
 
-                if (currencyName == null) {
-                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d&a.", amount, cost);
-                } else {
-                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d %s&a.", amount, cost, currencyName);
-                }
-                return true;
-            } else {
-                EconomyResponse r = econ.withdrawPlayer(playerName1, cost);
-                if (!r.transactionSuccess()) {
-                    send(sender, "&cYour payment failed, try again or contact an admin. Reason: &e\"%s\"", r.errorMessage);
-                    return true;
-                }
-                getConfig().set(playerName1 + ".credits", amount);
-                saveConfig();
-
-                if (currencyName == null) {
-                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d&a.", amount, cost);
-                } else {
-                    send(sender, "&aYou bought &6%d&c McMMO credits for &6%d %s&a.", amount, cost, currencyName);
-                }
+            EconomyResponse r = econ.withdrawPlayer(playerName1, cost);
+            if (!r.transactionSuccess()) {
+                send(sender, "&cYour payment failed, try again or contact an admin. Reason: &e\"%s\"", r.errorMessage);
                 return true;
             }
+
+            int newAmount = oldAmount + amount;
+            getConfig().set(playerName1 + ".credits", newAmount);
+            saveConfig();
+
+            if (currencyName == null) {
+                send(sender, "&aYou bought &6%d&c McMMO credits for &6%d&a.", amount, cost);
+            } else {
+                send(sender, "&aYou bought &6%d&c McMMO credits for &6%d %s&a.", amount, cost, currencyName);
+            }
+            return true;
         } else if (cmd.getName().equals("rmhelp")) {
             send(sender, "&e----- &9RedeemMCMMO Help ~ Player Commands&e -----");
             send(sender, ((econ != null && sender.hasPermission("redeemMCMMO.buycredits")) ? "&b" : "&c") + "/buycredits <amount>&e - Buy credits with ingame money if it is enabled.");
