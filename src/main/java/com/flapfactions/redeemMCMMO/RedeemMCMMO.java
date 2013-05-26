@@ -128,168 +128,160 @@ public class RedeemMCMMO extends JavaPlugin {
 
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String args[]) {
         if (cmd.getName().equals("addcredits")) {
-            if (args.length == 2) {
-                Player target = (Bukkit.getServer().getPlayer(args[0]));
-                if (target == null) {
-                    send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
-                    return true; // TODO unindent
-                } else {
-                    String targetPlayer = target.getName();
-                    String targetName = getConfig().getString(targetPlayer);
-                    int amount;
-                    try {
-                        amount = Integer.parseInt(args[1]);
-                    } catch (NumberFormatException e) {
-                        send(sender, "&cThe amount must be a positive integer!");
-                        return true;
-                    }
-                    if (amount <= 0) {
-                        send(sender, "&cThe amount must be a positive integer!");
-                        return true;
-                    }
-                    int newAmount;
-                    if (targetName != null) {
-                        int oldAmount = getConfig().getInt(targetPlayer + ".credits");
-                        newAmount = oldAmount + amount;
-                    } else {
-                        newAmount = amount;
-                    }
-                    getConfig().set(targetPlayer + ".credits", newAmount);
-                    saveConfig();
-                    send(sender, "&aYou have given &e%s&a &6%d&a McMMO credits.", targetPlayer, amount);
-                    send(target, "&aYou have just received &6%d&a McMMO credits.", amount);
-                    send(target, "&aNEW CREDIT BALANCE: &6%d", newAmount);
-                    send(target, "&aUse &b/rmhelp&a for help with redeeming them!");
+            if (args.length != 2) {
+                return false; // usage
+            }
+            Player target = (Bukkit.getServer().getPlayer(args[0]));
+            if (target == null) {
+                send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
+                return true; // TODO unindent
+            }
+            String targetPlayer = target.getName();
+            String targetName = getConfig().getString(targetPlayer);
+            int amount;
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
+            }
+            if (amount <= 0) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
+            }
+            int newAmount;
+            if (targetName != null) {
+                int oldAmount = getConfig().getInt(targetPlayer + ".credits");
+                newAmount = oldAmount + amount;
+            } else {
+                newAmount = amount;
+            }
+            getConfig().set(targetPlayer + ".credits", newAmount);
+            saveConfig();
+            send(sender, "&aYou have given &e%s&a &6%d&a McMMO credits.", targetPlayer, amount);
+            send(target, "&aYou have just received &6%d&a McMMO credits.", amount);
+            send(target, "&aNEW CREDIT BALANCE: &6%d", newAmount);
+            send(target, "&aUse &b/rmhelp&a for help with redeeming them!");
+            return true;
+        } else if (cmd.getName().equals("takecredits")) {
+            if (args.length != 2) {
+                return false; // usage
+            }
+            Player target = (Bukkit.getServer().getPlayer(args[0]));
+            if (target == null) {
+                send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
+                return true;
+            }
+            String targetPlayer = target.getName();
+            String targetName = getConfig().getString(targetPlayer);
+            int amount;
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
+            }
+            if (amount <= 0) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
+            }
+            if (targetName == null) {
+                send(sender, "&e%s&c doesn't have any credits!", targetPlayer);
+                return true;
+            }
+            int oldAmount = getConfig().getInt(targetPlayer + ".credits");
+            int newAmount = oldAmount - amount;
+            if (newAmount < 0) {
+                // typo leniency - if you overshoot by less than 10, the command still goes through
+                if (newAmount < -10) {
+                    send(sender, "&e%s&c doesn't have that many credits!", targetPlayer);
                     return true;
                 }
-            } else {
-                return false; // usage
+                send(sender, "&e%s&c doesn't have &6%d&c credits! Assuming you want to take &6%d&c credits.", targetPlayer, amount, oldAmount);
+                amount = oldAmount;
+                newAmount = 0;
             }
-        } else if (cmd.getName().equals("takecredits")) {
-            if (args.length == 2) {
-                Player target = (Bukkit.getServer().getPlayer(args[0]));
-                if (target == null) {
-                    send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
-                    return true; // TODO unindent
-                } else {
-                    String targetPlayer = target.getName();
-                    String targetName = getConfig().getString(targetPlayer);
-                    int amount;
-                    try {
-                        amount = Integer.parseInt(args[1]);
-                    } catch (NumberFormatException e) {
-                        send(sender, "&cThe amount must be a positive integer!");
-                        return true;
-                    }
-                    if (amount <= 0) {
-                        send(sender, "&cThe amount must be a positive integer!");
-                        return true;
-                    }
-                    if (targetName != null) {
-                        int oldAmount = getConfig().getInt(targetPlayer + ".credits");
-                        int newAmount = oldAmount - amount;
-                        if (newAmount < 0) {
-                            // typo leniency - if you overshoot by less than 10, the command still goes through
-                            if (newAmount < -10) {
-                                send(sender, "&e%s&c doesn't have that many credits!", targetPlayer);
-                                return true;
-                            }
-                            send(sender, "&e%s&c doesn't have &6%d&c credits! Assuming you want to take &6%d&c credits.", targetPlayer, amount, oldAmount);
-                            amount = oldAmount;
-                            newAmount = 0;
-                        }
-                        getConfig().set(targetPlayer + ".credits", newAmount);
-                        saveConfig();
-                        send(sender, "&aYou have taken &6%d&a credits off &e%s", amount, targetPlayer);
-                        send(target, "&aYou have lost &6%d&a credits.", amount);
-                        send(target, "&aNEW CREDIT BALANCE: &6%d", newAmount);
-                        return true;
-                    } else {
-                        send(sender, "&e%s&c doesn't have any credits!", targetPlayer);
-                        return true; // TODO unindent
-                    }
-                }
-            } else {
-                return false; // usage
-            }
+            getConfig().set(targetPlayer + ".credits", newAmount);
+            saveConfig();
+            send(sender, "&aYou have taken &6%d&a credits off &e%s", amount, targetPlayer);
+            send(target, "&aYou have lost &6%d&a credits.", amount);
+            send(target, "&aNEW CREDIT BALANCE: &6%d", newAmount);
+            return true;
         } else if (cmd.getName().equals("sendcredits")) {
             if (CommandUtils.noConsoleUsage(sender)) {
                 return true;
             }
-            if (args.length == 2) {
-                Player target = getServer().getPlayer(args[0]);
-                if (target == null) {
-                    send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
+            if (args.length != 2) {
+                return false; // usage
+            }
+            Player target = getServer().getPlayer(args[0]);
+            if (target == null) {
+                send(sender, "&e%s&c is not online or doesn't exist!", args[0]);
+                return true;
+            }
+            String targetPlayer = target.getName();
+            String targetName = getConfig().getString(targetPlayer);
+            Player source = (Player) sender;
+            String sourcePlayer = source.getName();
+            String sourceName = getConfig().getString(sourcePlayer);
+            int amount;
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
+            }
+            if (amount <= 0) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
+            }
+            if (sourceName == null) {
+                send(sender, "&eYou&c don't have any credits to send!");
+                return true;
+            }
+            int sourceOldAmount = getConfig().getInt(targetPlayer + ".credits");
+            if (amount > sourceOldAmount) {
+                send(sender, "&eYou&c don't have &6%d&c credits!", amount);
+                return true;
+            }
+            int newSourceAmount = sourceOldAmount - amount;
+            int oldTargetAmount = 0;
+            if (targetName != null) {
+                oldTargetAmount = getConfig().getInt(targetPlayer + ".credits");
+            }
+            int newTargetAmount = oldTargetAmount + amount;
+            getConfig().set(targetPlayer + ".credits", newTargetAmount);
+            getConfig().set(sourcePlayer + ".credits", newSourceAmount);
+            saveConfig();
+            send(sender, "&aYou have sent &6%d&a McMMO credits to &e%s&a.", amount, targetPlayer);
+            send(target, "&aYou have just received &6%d&a McMMO credits from &e%s&a.", amount, sourcePlayer);
+            send(sender, "&aNEW CREDIT BALANCE: &6%d", newSourceAmount);
+            send(target, "&aNEW CREDIT BALANCE: &6%d", newTargetAmount);
+            return true;
+        } else if (cmd.getName().equals("credits")) {
+            if (args.length == 0) {
+                if (CommandUtils.noConsoleUsage(sender)) {
                     return true;
                 }
-                String targetPlayer = target.getName();
-                String targetName = getConfig().getString(targetPlayer);
-                Player source = (Player) sender;
-                String sourcePlayer = source.getName();
-                String sourceName = getConfig().getString(sourcePlayer);
-                int amount;
-                try {
-                    amount = Integer.parseInt(args[1]);
-                } catch (NumberFormatException e) {
-                    send(sender, "&cThe amount must be a positive integer!");
-                    return true;
+                Player player = (Player) sender;
+                String name = player.getName();
+                String playerName = getConfig().getString(name);
+                int credits = 0;
+                if (playerName != null) {
+                    credits = getConfig().getInt(name + ".credits");
                 }
-                if (amount <= 0) {
-                    send(sender, "&cThe amount must be a positive integer!");
-                    return true;
-                }
-                if (sourceName == null) {
-                    send(sender, "&eYou&c don't have any credits to send!");
-                    return true;
-                }
-                int sourceOldAmount = getConfig().getInt(targetPlayer + ".credits");
-                if (amount > sourceOldAmount) {
-                    send(sender, "&eYou&c don't have &6%d&c credits!", amount);
-                    return true;
-                }
-                int newSourceAmount = sourceOldAmount - amount;
-                int oldTargetAmount = 0;
+                send(sender, "&aYou have &6%d&a McMMO credits remaining.", credits);
+                return true;
+            } else if (args.length == 1) {
+                String targetName = getConfig().getString(args[0]);
+                int credits = 0;
                 if (targetName != null) {
-                    oldTargetAmount = getConfig().getInt(targetPlayer + ".credits");
+                    credits = getConfig().getInt(args[0] + ".credits");
                 }
-                int newTargetAmount = oldTargetAmount + amount;
-                getConfig().set(targetPlayer + ".credits", newTargetAmount);
-                getConfig().set(sourcePlayer + ".credits", newSourceAmount);
-                saveConfig();
-                send(sender, "&aYou have sent &6%d&a McMMO credits to &e%s&a.", amount, targetPlayer);
-                send(target, "&aYou have just received &6%d&a McMMO credits from &e%s&a.", amount, sourcePlayer);
-                send(sender, "&aNEW CREDIT BALANCE: &6%d", newSourceAmount);
-                send(target, "&aNEW CREDIT BALANCE: &6%d", newTargetAmount);
+                send(sender, "&e%s&a has &6%d&a McMMO credits remaining.", args[0], credits);
                 return true;
             } else {
                 return false; // usage
-            }
-        } else if (cmd.getName().equals("credits")) {
-            if (!(sender instanceof Player)) {
-                send(sender, "&cThis command can only be run by a player!");
-                return true;
-            } else {
-                Player player = (Player) sender;
-                if (args.length == 0) {
-                    String name = player.getName();
-                    String playerName = getConfig().getString(name);
-                    int credits = 0;
-                    if (playerName != null) {
-                        credits = getConfig().getInt(name + ".credits");
-                    }
-                    send(player, "&aYou have &6%d&a McMMO credits remaining.", credits);
-                    return true;
-                } else if (args.length == 1) { // TODO allow console
-                    String targetName = getConfig().getString(args[0]);
-                    int credits = 0;
-                    if (targetName != null) {
-                        credits = getConfig().getInt(args[0] + ".credits");
-                    }
-                    send(player, "&e%s&a has &6%d&a McMMO credits remaining.", args[0], credits);
-                    return true;
-                } else {
-                    return false; // usage
-                }
             }
         } else if (cmd.getName().equals("rmreload")) {
             reloadConfig();
@@ -300,41 +292,40 @@ public class RedeemMCMMO extends JavaPlugin {
                 return true;
             }
             Player player = (Player) sender;
-            if (args.length == 2) {
-                String skillType = args[0];
-                try {
-                    int cap = ExperienceAPI.getLevelCap(skillType);
-                    int amount = Integer.parseInt(args[1]);
+            if (args.length != 2) {
+                return false; // usage
+            }
+            String skillType = args[0];
+            try {
+                int cap = ExperienceAPI.getLevelCap(skillType);
+                int amount = Integer.parseInt(args[1]);
 
-                    int oldAmount = getConfig().getInt(player.getName() + ".credits");
-                    if (oldAmount < amount) {
-                        send(player, "&cYou do not have enough credits!");
-                        return true;
-                    }
-                    if (amount <= 0) {
-                        send(player, "&cThe amount must be a positive integer!");
-                        return true;
-                    }
-                    if (ExperienceAPI.getLevel(player, skillType) + amount > cap) {
-                        send(player, "&cYou may not exceed the maximum level (&d%d&c) for &6%s&c!", cap, skillType);
-                        return true;
-                    }
-                    int newAmount = oldAmount - amount;
-                    getConfig().set(player.getName() + ".credits", newAmount);
-                    ExperienceAPI.addLevel(player, skillType, amount);
-                    saveConfig();
-                    send(player, "&aYou have gained &d%d&a levels in &6%s&a!", amount, skillType);
-                    send(sender, "&aNEW CREDIT BALANCE: &6%d", newAmount);
-                    return true;
-                } catch (InvalidSkillException e) {
-                    send(player, "&e%s&c is not a valid skill!", skillType);
-                    return true;
-                } catch (NumberFormatException e) {
-                    send(sender, "&cThe amount must be a positive integer!");
+                int oldAmount = getConfig().getInt(player.getName() + ".credits");
+                if (oldAmount < amount) {
+                    send(player, "&cYou do not have enough credits!");
                     return true;
                 }
-            } else {
-                return false; // usage
+                if (amount <= 0) {
+                    send(player, "&cThe amount must be a positive integer!");
+                    return true;
+                }
+                if (ExperienceAPI.getLevel(player, skillType) + amount > cap) {
+                    send(player, "&cYou may not exceed the maximum level (&d%d&c) for &6%s&c!", cap, skillType);
+                    return true;
+                }
+                int newAmount = oldAmount - amount;
+                getConfig().set(player.getName() + ".credits", newAmount);
+                ExperienceAPI.addLevel(player, skillType, amount);
+                saveConfig();
+                send(player, "&aYou have gained &d%d&a levels in &6%s&a!", amount, skillType);
+                send(sender, "&aNEW CREDIT BALANCE: &6%d", newAmount);
+                return true;
+            } catch (InvalidSkillException e) {
+                send(player, "&e%s&c is not a valid skill!", skillType);
+                return true;
+            } catch (NumberFormatException e) {
+                send(sender, "&cThe amount must be a positive integer!");
+                return true;
             }
         } else if (cmd.getName().equals("buycredits")) {
             if (CommandUtils.noConsoleUsage(sender)) {
@@ -359,10 +350,11 @@ public class RedeemMCMMO extends JavaPlugin {
             if (balance < cost) {
                 if (currencyName == null) {
                     send(sender, "&cYou do not have enough money to buy &6%d&c credits; you need at least &6%d&c.", amount, cost);
+                    return true;
                 } else {
                     send(sender, "&cYou do not have enough money to buy &6%d&c credits; you need at least &6%d %s&c.", amount, cost, currencyName);
+                    return true;
                 }
-                return true;
             }
 
             String playerName1 = player.getName();
@@ -385,10 +377,11 @@ public class RedeemMCMMO extends JavaPlugin {
 
             if (currencyName == null) {
                 send(sender, "&aYou bought &6%d&c McMMO credits for &6%d&a.", amount, cost);
+                return true;
             } else {
                 send(sender, "&aYou bought &6%d&c McMMO credits for &6%d %s&a.", amount, cost, currencyName);
+                return true;
             }
-            return true;
         } else if (cmd.getName().equals("rmhelp")) {
             send(sender, "&e----- &9RedeemMCMMO Help ~ Player Commands&e -----");
             send(sender, ((econ != null && sender.hasPermission("redeemMCMMO.buycredits")) ? "&b" : "&c") + "/buycredits <amount>&e - Buy credits with ingame money if it is enabled.");
