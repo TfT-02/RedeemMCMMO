@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.api.ExperienceAPI;
+import com.gmail.nossr50.api.exceptions.InvalidSkillException;
 import com.gmail.nossr50.util.commands.CommandUtils;
 
 public class RedeemMCMMO extends JavaPlugin {
@@ -32,35 +33,41 @@ public class RedeemMCMMO extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         PluginManager plugMan = getServer().getPluginManager();
+
         Plugin mcm = plugMan.getPlugin("mcmmo");
         if (!(mcm instanceof mcMMO)) {
             throw new UnknownDependencyException("Can't find the right mcMMO, did it have an update?");
         }
-        mcmmo = (mcMMO) mcm;
-        if (!mcmmo.isEnabled()) {
-            getLogger().severe("mcMMO is not enabled! Disabling RedeemMCMMO!");
+        if (!mcm.isEnabled()) {
+            getLogger().severe(format("&emcMMO&c is not enabled! Disabling RedeemMCMMO!"));
             plugMan.disablePlugin(this);
             return;
         }
-        econ = getEconomy();
-        if (econ == null) {
-            getLogger().warning("Failed to setup economy! Economy features will be disabled.");
+
+        if (getConfig().getBoolean("vault")) {
+            econ = getEconomy();
+            if (econ == null) {
+                getLogger().warning(format("&cFailed to setup economy! &eEconomy features will be disabled."));
+            }
         }
-        pl = new playerListener(this);
-        plugMan.registerEvents(this.pl, this);
+
         try {
             Metrics metrics = new Metrics(this);
             metrics.start();
         } catch (IOException e) {
-            getLogger().warning("Failed to submit Plugin Metrics :(");
+            getLogger().warning(format("&dFailed to submit Plugin Metrics :("));
         }
+
+        pl = new playerListener(this);
+        plugMan.registerEvents(this.pl, this);
+
         creditsFile = new File(this.getDataFolder(), "credits.yml");
         credits = YamlConfiguration.loadConfiguration(creditsFile);
-        getConfig().options().copyDefaults(true);
         saveConfig();
 
-        getLogger().info(ChatColor.GREEN + "RedeemMCMMO is now enabled - Originally by Candybuddy");
+        getLogger().info(format("&aRedeemMCMMO is now enabled - &dOriginally by Candybuddy"));
     }
 
     @Override
@@ -78,6 +85,12 @@ public class RedeemMCMMO extends JavaPlugin {
         }
     }
 
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        credits = YamlConfiguration.loadConfiguration(creditsFile);
+    }
+
     private Economy getEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return null;
@@ -89,22 +102,27 @@ public class RedeemMCMMO extends JavaPlugin {
         return rsp.getProvider();
     }
 
-    public void send(CommandSender to, String formatMessage, Object... items) {
-        String formatB = ChatColor.translateAlternateColorCodes('&', formatMessage);
-        to.sendMessage(String.format(formatB, items));
+    public void send(CommandSender to, String formatMessage, Object... args) {
+        to.sendMessage(format(formatMessage, args));
+    }
+
+    public String format(String formatMessage, Object... args) {
+        if (args == null)
+            return ChatColor.translateAlternateColorCodes('&', formatMessage);
+        return String.format(ChatColor.translateAlternateColorCodes('&', formatMessage), args);
     }
 
     /*
      * Green: A
      * Aqua: B
      * Red: C
-     * Light Purple: D
+     * Gold: 6
      * Yellow: E
      *
      * Success messages should be in Green
      * Failure messages should be in Red
      * Players should be enclosed in Yellow
-     * Credits should be enclosed in Light Purple
+     * Credits should be enclosed in Gold
      * Commands should be in Aqua
      */
 
