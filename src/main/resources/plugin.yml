@@ -1,66 +1,53 @@
-name: RedeemMCMMO
-main: com.flapfactions.redeemMCMMO.RedeemMCMMO
+name: mcMMO-Redeem
 version: ${project.version}
-author: Candybuddy
-description: A plugin that allows players to redeem MCMMO levels in any skill.
-depend: [mcMMO]
-softdepend: [Vault]
-commands:
-  addcredits:
-    description: Give a player credits towards MCMMO levels.
-    usage: /addcredits <player> <amount>
-    permission: redeemMCMMO.addcredits
-    permission-message: You do not have permission to create credits.
-  takecredits:
-    description: Takes credits from a player.
-    usage: /takecredits <player> <amount>
-    permission: redeemMCMMO.takecredits
-    permission-message: You do not have permission to remove credits.
-  sendcredits:
-    description: Give another player some of your credits towards McMMO levels.
-    usage: /sendcredits <player> <amount>
-    permission: redeemMCMMO.sendcredits
-    permission-message: You do not have permission to send others credits.
-  buycredits:
-    description: Buy credits.
-    usage: /buycredits <amount>
-    permission: redeemMCMMO.buycredits
-    permission-message: You do not have permission to purchase credits.
-  credits:
-    description: Shows the amount of credits you have.
-    usage: /credits [player]
-    permission: redeemMCMMO.showcredits
-    permission-message: You do not have permission to view your credits.
-  rmreload:
-    description: Reloads the config file.
-    usage: /rmreload
-    permission: redeemMCMMO.rmreload
-    permission-message: You do not have permission to use this command.
-  redeem:
-    description: Redeem mcmmo levels from your credits.
-    usage: /redeem <skill> <amount>
-    permission: redeemMCMMO.redeem
-    permission-message: You do not have permission to redeem credits.
-  rmhelp:
-    description: Veiw a list of commands for redeemMCMMO.
-    usage: /rmhelp
-    permission: redeemMCMMO.rmhelp
-    permission-message: You do not have permission to use this command.
-permissions:
-  redeemMCMMO.addcredits:
-    default: op
-  redeemMCMMO.takecredits:
-    default: op
-  redeemMCMMO.sendcredits:
-    default: true
-  redeemMCMMO.buycredits:
-    default: true
-  redeemMCMMO.showcredits:
-    default: true
-  redeemMCMMO.rmreload:
-    default: op
-  redeemMCMMO.redeem:
-    default: true
-  redeemMCMMO.rmhelp:
-    default: true
+description: A plugin that allows players to redeem mcMMO levels in any skill.
 
+main: com.me.tft_02.mcmmoredeem.mcMMORedeem
+author: TfT_02
+softdepend: [mcMMO, Vault]
+
+commands:
+    addcredits:
+        description: Give a player credits towards mcMMO levels.
+        usage: /addcredits <player> <amount>
+        permission: mcmmoredeem.commands.addcredits
+        permission-message: You do not have permission to create credits.
+    takecredits:
+        description: Takes credits from a player.
+        usage: /takecredits <player> <amount>
+        permission: mcmmoredeem.commands.takecredits
+        permission-message: You do not have permission to remove credits.
+    sendcredits:
+        description: Give another player some of your credits towards McMMO levels.
+        usage: /sendcredits <player> <amount>
+        permission: mcmmoredeem.commands.sendcredits
+        permission-message: You do not have permission to send others credits.
+    buycredits:
+        description: Buy credits.
+        usage: /buycredits <amount>
+        permission: mcmmoredeem.commands.buycredits
+        permission-message: You do not have permission to purchase credits.
+    credits:
+        description: Shows the amount of credits you have.
+        usage: /credits [player]
+        permission: mcmmoredeem.commands.credits
+        permission-message: You do not have permission to view your credits.
+    redeem:
+        description: Redeem mcmmo levels from your credits.
+        usage: /redeem <skill> <amount>
+        permission: mcmmoredeem.commands.redeem
+        permission-message: You do not have permission to redeem credits.
+
+permissions:
+    mcmmoredeem.commands.buycredits
+        default: true
+    mcmmoredeem.commands.credits
+        default: true
+    mcmmoredeem.commands.redeem
+        default: true
+    mcmmoredeem.commands.sendcredits
+        default: true
+    mcmmoredeem.commands.takecredits
+        default: op
+    mcmmoredeem.commands.addcredits
+        default: op

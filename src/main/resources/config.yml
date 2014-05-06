@@ -1,5 +1,21 @@
-joinMessage: true
-startupAmount: 50
-vault: true
-costPerCredit: 10
+General:
+    Locale: en_US
 
+    # Amount of time (in minutes) to wait between saves of player information
+    Save_Interval: 10
+
+    # Allow mcMMO-Redeem to check if a new version is available
+    Update_Check: true
+    Prefer_Beta: false
+
+    # Should mcMMO-Redeem print out debug messages?
+    Verbose_Logging: false
+
+    # Should mcMMO-Redeem over-write configs to update, or make new ones ending in .new?
+    Config_Update_Overwrite: true
+
+Redeem:
+    Join_Message: true
+    Startup_Amount: 50
+    Use_Vault: true
+    Cost_Per_Credit: 10
