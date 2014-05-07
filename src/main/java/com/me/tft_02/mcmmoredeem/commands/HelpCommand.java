@@ -29,7 +29,7 @@ public class HelpCommand implements CommandExecutor {
     }
 
     private void getHelpPage(int page, CommandSender sender) {
-        int maxPages = 2;
+        int maxPages = 3;
         int nextPage = page + 1;
 
         if (page > maxPages) {
@@ -41,33 +41,38 @@ public class HelpCommand implements CommandExecutor {
         switch (page) {
             case 1:
                 sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_0"));
-
-                if (Permissions.credits(sender)) {
-                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_1"));
-                }
-
-                if (Permissions.redeem(sender)) {
-                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_2"));
-                }
-
-                if (Permissions.buyCredits(sender)) {
-                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_3"));
-                }
-
-                if (Permissions.sendCredits(sender)) {
-                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_4"));
-                }
+                sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_1"));
                 return;
 
             case 2:
                 sendHelpPage(sender, LocaleLoader.getString("Help.Page_1.Line_0"));
 
-                if (Permissions.addCredits(sender)) {
+                if (Permissions.credits(sender)) {
                     sendHelpPage(sender, LocaleLoader.getString("Help.Page_1.Line_1"));
                 }
 
-                if (Permissions.takeCredits(sender)) {
+                if (Permissions.redeem(sender)) {
                     sendHelpPage(sender, LocaleLoader.getString("Help.Page_1.Line_2"));
+                }
+
+                if (Permissions.buyCredits(sender)) {
+                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_1.Line_3"));
+                }
+
+                if (Permissions.sendCredits(sender)) {
+                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_1.Line_4"));
+                }
+                return;
+
+            case 3:
+                sendHelpPage(sender, LocaleLoader.getString("Help.Page_2.Line_0"));
+
+                if (Permissions.addCredits(sender)) {
+                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_2.Line_1"));
+                }
+
+                if (Permissions.takeCredits(sender)) {
+                    sendHelpPage(sender, LocaleLoader.getString("Help.Page_2.Line_2"));
                 }
 
                 return;
