@@ -2,7 +2,6 @@ package com.me.tft_02.mcmmoredeem;
 
 import java.io.File;
 
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,9 +32,6 @@ public class mcMMORedeem extends JavaPlugin {
 
     public Economy econ = null;
 
-    public File creditsFile;
-    public YamlConfiguration credits;
-
     @Override
     public void onEnable() {
         p = this;
@@ -46,7 +42,7 @@ public class mcMMORedeem extends JavaPlugin {
         setupMcMMO();
 
         if (!isMcMMOEnabled()) {
-            this.getLogger().warning("mcMMO-Redeem requires mcMMO to run, please download mcMMO. http://dev.bukkit.org/server-mods/mcmmo/");
+            getLogger().warning("mcMMO-Redeem requires mcMMO to run, please download mcMMO. http://dev.bukkit.org/server-mods/mcmmo/");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -83,9 +79,18 @@ public class mcMMORedeem extends JavaPlugin {
         return mcMMOEnabled;
     }
 
+    private Economy getEconomy() {
+        if (!getServer().getPluginManager().isPluginEnabled("Vault")) {
+            getLogger().warning("Vault is required for cconomy features!");
+            return null;
+        }
+
+        RegisteredServiceProvider<Economy> registeredServiceProvider = getServer().getServicesManager().getRegistration(Economy.class);
+        return (registeredServiceProvider == null) ? null : registeredServiceProvider.getProvider();
+    }
+
     @Override
     public void onDisable() {
-        saveConfig();
         CreditsManager.saveCredits();
     }
 
@@ -115,20 +120,5 @@ public class mcMMORedeem extends JavaPlugin {
         redeemMcMMO = getFile();
         mainDirectory = getDataFolder().getPath() + File.separator;
         flatFileDirectory = mainDirectory + "flatfile" + File.separator;
-    }
-
-    @Override
-    public void reloadConfig() {
-        super.reloadConfig();
-        credits = YamlConfiguration.loadConfiguration(creditsFile);
-    }
-
-    private Economy getEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return null;
-        }
-
-        RegisteredServiceProvider<Economy> registeredServiceProvider = getServer().getServicesManager().getRegistration(Economy.class);
-        return (registeredServiceProvider == null) ? null : registeredServiceProvider.getProvider();
     }
 }
