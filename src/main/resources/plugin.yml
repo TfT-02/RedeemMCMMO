@@ -18,7 +18,7 @@ commands:
         permission: mcmmoredeem.commands.takecredits
         permission-message: You do not have permission to remove credits.
     sendcredits:
-        description: Give another player some of your credits towards McMMO levels.
+        description: Give another player some of your credits towards mcMMO levels.
         usage: /sendcredits <player> <amount>
         permission: mcmmoredeem.commands.sendcredits
         permission-message: You do not have permission to send others credits.
@@ -39,15 +39,15 @@ commands:
         permission-message: You do not have permission to redeem credits.
 
 permissions:
-    mcmmoredeem.commands.buycredits
+    mcmmoredeem.commands.buycredits:
         default: true
-    mcmmoredeem.commands.credits
+    mcmmoredeem.commands.credits:
         default: true
-    mcmmoredeem.commands.redeem
+    mcmmoredeem.commands.redeem:
         default: true
-    mcmmoredeem.commands.sendcredits
+    mcmmoredeem.commands.sendcredits:
         default: true
-    mcmmoredeem.commands.takecredits
+    mcmmoredeem.commands.takecredits:
         default: op
-    mcmmoredeem.commands.addcredits
+    mcmmoredeem.commands.addcredits:
         default: op
