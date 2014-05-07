@@ -30,7 +30,9 @@ public class CreditsManager {
             }
         }
 
-        return new PlayerData(uuid);
+        PlayerData playerData = new PlayerData(uuid);
+        players.add(playerData);
+        return playerData;
     }
 
     public static int getCredits(UUID uuid) {
