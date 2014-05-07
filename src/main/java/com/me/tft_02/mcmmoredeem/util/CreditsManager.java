@@ -74,6 +74,7 @@ public class CreditsManager {
             PlayerData playerData = new PlayerData(uuid);
 
             playerData.setPlayerName(creditsFile.getString(uuid + ".Name"));
+            playerData.setCredits(creditsFile.getInt(uuid + ".Credits"));
 
             players.add(playerData);
         }
