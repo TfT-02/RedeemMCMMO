@@ -26,7 +26,7 @@ public class RedeemCommand  implements CommandExecutor {
 
         switch (args.length) {
             case 1:
-                if (!args[1].equalsIgnoreCase("help") || !args[1].equalsIgnoreCase("?")) {
+                if (!args[0].equalsIgnoreCase("help") || !args[0].equalsIgnoreCase("?")) {
                     printUsage(sender);
                     return true;
                 }
