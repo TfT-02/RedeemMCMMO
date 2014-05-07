@@ -42,7 +42,6 @@ public class HelpCommand implements CommandExecutor {
             case 1:
                 sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_0"));
                 sendHelpPage(sender, LocaleLoader.getString("Help.Page_0.Line_1"));
-                return;
 
             case 2:
                 sendHelpPage(sender, LocaleLoader.getString("Help.Page_1.Line_0"));
@@ -62,7 +61,6 @@ public class HelpCommand implements CommandExecutor {
                 if (Permissions.sendCredits(sender)) {
                     sendHelpPage(sender, LocaleLoader.getString("Help.Page_1.Line_4"));
                 }
-                return;
 
             case 3:
                 sendHelpPage(sender, LocaleLoader.getString("Help.Page_2.Line_0"));
@@ -75,13 +73,10 @@ public class HelpCommand implements CommandExecutor {
                     sendHelpPage(sender, LocaleLoader.getString("Help.Page_2.Line_2"));
                 }
 
-                return;
-
             default:
                 if (nextPage <= maxPages) {
                     sender.sendMessage(LocaleLoader.getString("Help.Page_Ending", "/redeem help", nextPage));
                 }
-                return;
         }
     }
 
