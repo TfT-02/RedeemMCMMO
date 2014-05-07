@@ -18,12 +18,6 @@ public class RedeemCommand  implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (CommandUtils.noConsoleUsage(sender)) {
-            return true;
-        }
-
-        Player player = (Player) sender;
-
         switch (args.length) {
             case 1:
                 if (!args[0].equalsIgnoreCase("help") && !args[0].equalsIgnoreCase("?")) {
@@ -34,6 +28,12 @@ public class RedeemCommand  implements CommandExecutor {
                 return helpCommand.onCommand(sender, command, label, args);
 
             case 2:
+                if (CommandUtils.noConsoleUsage(sender)) {
+                    return true;
+                }
+
+                Player player = (Player) sender;
+
                 String skillType = args[0];
 
                 if (CommandUtils.isInvalidSkill(sender, skillType)) {
