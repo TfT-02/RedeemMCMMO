@@ -10,15 +10,13 @@ public class PlayerData {
     private Player player;
     private int credits;
 
-    public PlayerData(String uuid) {
-        this.uuid = UUID.fromString(uuid);
+    public PlayerData(UUID uuid) {
+        this.uuid = uuid;
         this.credits = 0;
     }
 
-    public PlayerData(Player player) {
-        this.uuid = player.getUniqueId();
-        this.playerName = player.getName();
-        this.player = player;
+    public PlayerData(String uuid) {
+        this.uuid = UUID.fromString(uuid);
         this.credits = 0;
     }
 

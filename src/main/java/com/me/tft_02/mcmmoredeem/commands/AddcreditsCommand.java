@@ -23,8 +23,6 @@ public class AddcreditsCommand implements CommandExecutor {
                     return true;
                 }
 
-                String targetName = target.getName();
-
                 if (CommandUtils.isInvalidInteger(sender, args[1])) {
                     return true;
                 }
@@ -38,7 +36,7 @@ public class AddcreditsCommand implements CommandExecutor {
                 PlayerData playerData = CreditsManager.getPlayerData(target.getUniqueId());
                 int newAmount = playerData.addCredits(amount);
 
-                sender.sendMessage(LocaleLoader.getString("Commands.Addcredits.Sender", targetName, amount));
+                sender.sendMessage(LocaleLoader.getString("Commands.Addcredits.Sender", target.getName(), amount));
 
                 target.sendMessage(LocaleLoader.getString("Commands.Generic.CreditReceived.1", amount));
                 target.sendMessage(LocaleLoader.getString("Commands.Generic.CreditBalance", newAmount));
