@@ -59,7 +59,8 @@ public class SendcreditsCommand  implements CommandExecutor {
                 return true;
 
             default:
-                return false;
+                sender.sendMessage(LocaleLoader.getString("Commands.Usage.2", "sendcredits", "<player>", "<amount>"));
+                return true;
         }
     }
 }

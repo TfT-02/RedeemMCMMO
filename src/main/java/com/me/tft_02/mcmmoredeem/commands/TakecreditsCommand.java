@@ -50,7 +50,8 @@ public class TakecreditsCommand implements CommandExecutor {
                 return true;
 
             default:
-                return false;
+                sender.sendMessage(LocaleLoader.getString("Commands.Usage.2", "takecredits", "<player>", "<amount>"));
+                return true;
         }
     }
 }

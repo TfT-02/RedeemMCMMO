@@ -46,7 +46,8 @@ public class AddcreditsCommand implements CommandExecutor {
                 return true;
 
             default:
-                return false;
+                sender.sendMessage(LocaleLoader.getString("Commands.Usage.2", "addcredits", "<player>", "<amount>"));
+                return true;
         }
     }
 }

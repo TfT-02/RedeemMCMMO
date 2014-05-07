@@ -57,7 +57,8 @@ public class BuycreditsCommand implements CommandExecutor {
                 return true;
 
             default:
-                return false;
+                sender.sendMessage(LocaleLoader.getString("Commands.Usage.1", "buycredits", "<amount>"));
+                return true;
         }
     }
 }

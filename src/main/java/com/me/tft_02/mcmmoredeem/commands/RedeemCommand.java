@@ -26,7 +26,7 @@ public class RedeemCommand  implements CommandExecutor {
 
         switch (args.length) {
             case 1:
-                if (!args[0].equalsIgnoreCase("help") || !args[0].equalsIgnoreCase("?")) {
+                if (!args[0].equalsIgnoreCase("help") && !args[0].equalsIgnoreCase("?")) {
                     printUsage(sender);
                     return true;
                 }
@@ -77,7 +77,7 @@ public class RedeemCommand  implements CommandExecutor {
 
     private void printUsage(CommandSender sender) {
         sender.sendMessage(LocaleLoader.getString("General.Plugin.Header", mcMMORedeem.p.getDescription().getName()));
-        sender.sendMessage(LocaleLoader.getString("General.Plugin.Authors", mcMMORedeem.p.getDescription().getAuthors()));
+        sender.sendMessage(LocaleLoader.getString("General.Plugin.Author", mcMMORedeem.p.getDescription().getAuthors().get(0)));
         sender.sendMessage(LocaleLoader.getString("General.Running_Version", mcMMORedeem.p.getDescription().getVersion()));
         sender.sendMessage(LocaleLoader.getString("General.Use_Help"));
     }
