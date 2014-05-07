@@ -15,6 +15,13 @@ public class PlayerData {
         this.credits = 0;
     }
 
+    public PlayerData(Player player) {
+        this.uuid = player.getUniqueId();
+        this.playerName = player.getName();
+        this.player = player;
+        this.credits = 0;
+    }
+
     public PlayerData(UUID uuid, String playerName, Player player, int credits) {
         this.uuid = uuid;
         this.playerName = playerName;

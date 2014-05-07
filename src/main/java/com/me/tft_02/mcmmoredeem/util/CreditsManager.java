@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import com.me.tft_02.mcmmoredeem.datatypes.PlayerData;
 import com.me.tft_02.mcmmoredeem.mcMMORedeem;
@@ -16,6 +17,22 @@ public class CreditsManager {
     private static File creditsFile = new File(creditsFilePath);
 
     private CreditsManager() {}
+
+    /**
+     * Add a playerdata object by its name
+     *
+     * @param player The Player object of the player
+     * @return new or existing player data
+     */
+    public static PlayerData addPlayerData(Player player) {
+        for (PlayerData playerData : players) {
+            if (playerData.getUuid().equals(player.getUniqueId())) {
+                return playerData;
+            }
+        }
+
+        return new PlayerData(player);
+    }
 
     /**
      * Retrieve a playerdata object by its name

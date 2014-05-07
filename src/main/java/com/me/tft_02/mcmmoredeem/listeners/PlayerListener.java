@@ -22,7 +22,7 @@ public class PlayerListener implements Listener {
             return;
         }
 
-        PlayerData playerData = CreditsManager.getPlayerData(event.getPlayer().getUniqueId());
+        PlayerData playerData = CreditsManager.addPlayerData(event.getPlayer());
         playerData.setCredits(startupAmount);
     }
 
