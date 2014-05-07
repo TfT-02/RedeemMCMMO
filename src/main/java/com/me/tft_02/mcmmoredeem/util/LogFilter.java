@@ -5,7 +5,6 @@ import java.util.logging.LogRecord;
 
 import com.me.tft_02.mcmmoredeem.mcMMORedeem;
 
-
 public class LogFilter implements Filter {
     private boolean debug;
 
