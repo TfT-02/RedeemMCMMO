@@ -12,12 +12,12 @@ public class PlayerData {
 
     public PlayerData(UUID uuid) {
         this.uuid = uuid;
-        this.credits = 0;
+        this.credits = -1;
     }
 
     public PlayerData(String uuid) {
         this.uuid = UUID.fromString(uuid);
-        this.credits = 0;
+        this.credits = -1;
     }
 
     public PlayerData(UUID uuid, String playerName, Player player, int credits) {
